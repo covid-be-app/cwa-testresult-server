@@ -69,7 +69,7 @@ public class TestResultControllerTest {
       new TestResult().setId("").setResult(0)
     );
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(invalid)))
@@ -86,7 +86,7 @@ public class TestResultControllerTest {
       new TestResult().setId(id)
     ));
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(invalid)))
@@ -97,7 +97,7 @@ public class TestResultControllerTest {
       new TestResult().setId(id).setResult(4)
     ));
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(invalid)))
@@ -115,7 +115,7 @@ public class TestResultControllerTest {
       new TestResult().setId(id).setResult(result)
     ));
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(valid)))
@@ -133,7 +133,7 @@ public class TestResultControllerTest {
       new TestResult().setId(id).setResult(result)
     ));
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(valid)))
@@ -143,7 +143,7 @@ public class TestResultControllerTest {
     TestResultRequest request = new TestResultRequest()
       .setId(id);
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/app/result")
+      .post("/v1/app/result")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
@@ -164,7 +164,7 @@ public class TestResultControllerTest {
     TestResultRequest request = new TestResultRequest()
       .setId(id);
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/app/result")
+      .post("/v1/app/result")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
