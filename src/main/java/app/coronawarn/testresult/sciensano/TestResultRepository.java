@@ -30,7 +30,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TestResultRepository extends JpaRepository<TestResultEntity, Long> {
 
-  Optional<TestResultEntity> findByMobileTestIdAndDatePatientInfectious(String mobileTestId, LocalDate datePatientInfectious);
+  Optional<TestResultEntity> findByMobileTestIdAndDatePatientInfectious(
+    String mobileTestId, LocalDate datePatientInfectious);
 
   @Modifying
   @Query("delete from TestResultEntity t where t.dateTestCommunicated <= ?1")

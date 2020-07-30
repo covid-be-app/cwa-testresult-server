@@ -51,12 +51,12 @@ databaseChangeLog:
             name: date_sample_collected
             type: date
             constraints:
-              nullable: false
+              nullable: true
         - column:
             name: date_test_performed
             type: date
             constraints:
-              nullable: false
+              nullable: true
         - column:
             name: date_test_communicated
             type: date

@@ -22,6 +22,8 @@
 package app.coronawarn.testresult;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
+import static app.coronawarn.testresult.entity.TestResultEntity.Result.POSITIVE;
+import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.LAB;
 import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import app.coronawarn.testresult.model.MobileTestResultUpdateRequest;
@@ -73,7 +75,7 @@ public class TestResultControllerTest {
         )
       );
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(invalid)))
@@ -88,13 +90,14 @@ public class TestResultControllerTest {
       .setMobileTestResultUpdateRequest (Collections.singletonList(
         new MobileTestResultUpdateRequest()
           .setResult(TestResultEntity.Result.PENDING)
+
           .setMobileTestId("123456789012345")
           .setDatePatientInfectious(null)
         )
       );
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(invalid)))
@@ -109,14 +112,15 @@ public class TestResultControllerTest {
     MobileTestResultList valid = new MobileTestResultList()
       .setMobileTestResultUpdateRequest (Collections.singletonList(
         new MobileTestResultUpdateRequest()
-          .setResult(TestResultEntity.Result.POSITIVE)
+          .setResult(POSITIVE)
+          .setResultChannel(LAB)
           .setMobileTestId("123456789012345")
           .setDatePatientInfectious(LocalDate.now())
         )
       );
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(valid)))
@@ -131,14 +135,15 @@ public class TestResultControllerTest {
     MobileTestResultList valid = new MobileTestResultList()
       .setMobileTestResultUpdateRequest (Collections.singletonList(
         new MobileTestResultUpdateRequest()
-          .setResult(TestResultEntity.Result.POSITIVE)
+          .setResult(POSITIVE)
+          .setResultChannel(LAB)
           .setMobileTestId(MOBILE_TEST_ID)
           .setDatePatientInfectious(now)
         )
       );
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
+      .post("/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(valid)))
@@ -151,7 +156,7 @@ public class TestResultControllerTest {
       .setDatePatientInfectious(now);
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/app/result")
+      .post("/v1/app/mobiletestresult")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
@@ -165,7 +170,7 @@ public class TestResultControllerTest {
       .setMobileTestId("987654321012345")
       .setDatePatientInfectious(LocalDate.now());
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/app/result")
+      .post("/v1/app/mobiletestresult")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))

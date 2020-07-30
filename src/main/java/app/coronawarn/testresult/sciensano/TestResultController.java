@@ -27,6 +27,7 @@ import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import app.coronawarn.testresult.model.MobileTestResultUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import java.time.LocalDate;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -54,13 +55,20 @@ public class TestResultController {
    * @return the test result response
    */
   @Operation(description = "Get test result response from request.")
-  @PostMapping(value = "/v1/app/result", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/v1/app/mobiletestresult", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
     log.info("Received test result request from app.");
-    Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(request.getMobileTestId(), request.getDatePatientInfectious());
+    Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
+      request.getMobileTestId(), request.getDatePatientInfectious());
+
+    testResultEntity.ifPresent(tr -> {
+      tr.setDateTestCommunicated(LocalDate.now());
+      testResultRepository.saveAndFlush(tr);
+    });
+
 
     return testResultEntity
-      .map(e->ResponseEntity.ok(e))
+      .map(ResponseEntity::ok)
       //TODO: verify if it is ok if we return a non-persisted pending result to the app
       .orElse(ResponseEntity.ok(pendingResult()));
   }
@@ -72,7 +80,7 @@ public class TestResultController {
    * @return the response
    */
   @Operation(description = "Create test results from collection.")
-  @PostMapping(value = "/api/v1/lab/results", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/v1/lab/results", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<?> results(@RequestBody @NotNull @Valid MobileTestResultList list) {
     // TODO: find out how this worked in DE (how this was secured)
     // https://github.com/corona-warn-app/cwa-testresult-server/issues/65
@@ -86,9 +94,16 @@ public class TestResultController {
     TestResultEntity testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       mobileTestResultUpdateRequest.getMobileTestId(),
       mobileTestResultUpdateRequest.getDatePatientInfectious()
-    ).orElse(pendingResult());
+    ).orElse(pendingResult(
+      mobileTestResultUpdateRequest.getMobileTestId(),
+      mobileTestResultUpdateRequest.getDatePatientInfectious())
+    );
 
+    testResultEntity.setDateTestPerformed(mobileTestResultUpdateRequest.getDateTestPerformed());
+    testResultEntity.setDateSampleCollected(mobileTestResultUpdateRequest.getDateSampleCollected());
+    testResultEntity.setResultChannel(mobileTestResultUpdateRequest.getResultChannel());
     testResultEntity.setResult(mobileTestResultUpdateRequest.getResult());
+    testResultRepository.saveAndFlush(testResultEntity);
 
   }
 

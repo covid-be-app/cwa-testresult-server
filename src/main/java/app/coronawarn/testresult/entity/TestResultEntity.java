@@ -22,7 +22,7 @@
 package app.coronawarn.testresult.entity;
 
 import static app.coronawarn.testresult.entity.TestResultEntity.Result.PENDING;
-import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.UNKOWN;
+import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.UNKNOWN;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -96,8 +96,30 @@ public class TestResultEntity {
   private LocalDate dateTestCommunicated;
 
 
+  /**
+   * Create a pending result without channel and other data.
+   *
+   * @return
+   */
   public static TestResultEntity pendingResult() {
-    return new TestResultEntity().setResult(PENDING).setResultChannel(UNKOWN);
+    return new TestResultEntity()
+      .setResult(PENDING)
+      .setResultChannel(UNKNOWN);
+  }
+
+  /**
+   * Create a pending result.
+   *
+   * @param mobileTestId The mobile test id.
+   * @param datePatientInfectious the date patient was diagnosed infectious.
+   * @return
+   */
+  public static TestResultEntity pendingResult(String mobileTestId,LocalDate datePatientInfectious) {
+    return new TestResultEntity()
+      .setResult(PENDING)
+      .setResultChannel(UNKNOWN)
+      .setMobileTestId(mobileTestId)
+      .setDatePatientInfectious(datePatientInfectious);
   }
 
   public enum Result {
@@ -105,6 +127,6 @@ public class TestResultEntity {
   }
 
   public enum ResultChannel {
-    UNKOWN,LAB,DOCTOR
+    UNKNOWN,LAB,DOCTOR
   }
 }

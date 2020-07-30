@@ -22,6 +22,8 @@
 package app.coronawarn.testresult.model;
 
 import app.coronawarn.testresult.entity.TestResultEntity.Result;
+import app.coronawarn.testresult.entity.TestResultEntity.ResultChannel;
+import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.UNKNOWN;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
@@ -50,8 +52,15 @@ public class MobileTestResultUpdateRequest {
   @NotNull
   private LocalDate datePatientInfectious;
 
+  private LocalDate dateSampleCollected;
+
+  private LocalDate dateTestPerformed;
+
+  private LocalDate dateTestCommunicated;
+
   @NotNull
   private Result result;
 
-
+  @NotNull
+  private ResultChannel resultChannel = UNKNOWN;
 }
