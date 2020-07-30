@@ -23,6 +23,7 @@ package app.coronawarn.testresult.entity;
 
 import static app.coronawarn.testresult.entity.TestResultEntity.Result.PENDING;
 import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.UNKNOWN;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -62,16 +63,22 @@ public class TestResultEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
+  @JsonIgnore
   private Long id;
 
   @CreatedDate
   @Column(name = "created_at")
+  @JsonIgnore
   private LocalDateTime createdAt;
+
   @LastModifiedDate
   @Column(name = "updated_at")
+  @JsonIgnore
   private LocalDateTime updatedAt;
+
   @Version
   @Column(name = "version")
+  @JsonIgnore
   private Long version;
 
   @Enumerated(ORDINAL)

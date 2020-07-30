@@ -48,7 +48,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("allow-result-insert")
+@ActiveProfiles("allow-test-result-insert")
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = TestResultApplication.class)
 public class TestResultControllerTest {

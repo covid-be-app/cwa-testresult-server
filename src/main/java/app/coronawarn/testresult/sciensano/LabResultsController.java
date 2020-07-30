@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 @RestController
-@Profile("allow-result-insert")
+@Profile("allow-test-result-insert")
 public class LabResultsController {
 
   private final TestResultRepository testResultRepository;
@@ -61,7 +61,7 @@ public class LabResultsController {
     testResultEntity.setResultChannel(mobileTestResultUpdateRequest.getResultChannel());
     testResultEntity.setResult(mobileTestResultUpdateRequest.getResult());
 
-    testResultRepository.saveAndFlush(testResultEntity);
+    testResultRepository.save(testResultEntity);
 
   }
 }

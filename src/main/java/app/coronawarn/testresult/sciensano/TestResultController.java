@@ -27,6 +27,7 @@ import app.coronawarn.testresult.model.MobileTestResultRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDate;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 @RestController
 public class TestResultController {
 
@@ -55,28 +57,20 @@ public class TestResultController {
   @Operation(description = "Get test result response from request.")
   @PostMapping(value = "/v1/app/mobiletestresult", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
-    log.info("Received test result request from app.");
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
 
+    // TODO: we will make this more robust by introducing an ack endpoint. (so app can notify it got the result)
+    // Backend will only set the dateTestCommunicated when the ack is received from app
     testResultEntity.ifPresent(tr -> {
       tr.setDateTestCommunicated(LocalDate.now());
-      testResultRepository.saveAndFlush(tr);
     });
 
-
     return testResultEntity
-      .map(
-        tr -> {
-          tr.setDateTestCommunicated(LocalDate.now());
-          testResultRepository.saveAndFlush(tr);
-          return ResponseEntity.ok(tr);
-        }
-      )
-      //TODO: verify if it is ok if we return a non-persisted pending result to the app in case it is not found.
+      .map(ResponseEntity::ok)
+      // If we don't find a test result (or we did a "dummy" poll)
+      // we simply return a dummy test result (plausible deniability)
       .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
   }
-
-
 
 }
