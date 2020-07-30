@@ -122,6 +122,23 @@ public class TestResultEntity {
       .setDatePatientInfectious(datePatientInfectious);
   }
 
+  /**
+   * Create a pending result.
+   *
+   * @param mobileTestId The mobile test id.
+   * @return
+   */
+  public static TestResultEntity dummyPendingResult(String mobileTestId) {
+    return new TestResultEntity()
+      .setResult(PENDING)
+      .setResultChannel(UNKNOWN)
+      .setMobileTestId(mobileTestId)
+      .setDateTestCommunicated(LocalDate.now())
+      .setDatePatientInfectious(LocalDate.now())
+      .setDateSampleCollected(LocalDate.now());
+  }
+
+
   public enum Result {
     PENDING, NEGATIVE, POSITIVE, INVALID, REDEEMED
   }

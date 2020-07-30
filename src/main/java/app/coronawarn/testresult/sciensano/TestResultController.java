@@ -22,6 +22,7 @@
 package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
+import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
 import static app.coronawarn.testresult.entity.TestResultEntity.pendingResult;
 import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
@@ -68,9 +69,15 @@ public class TestResultController {
 
 
     return testResultEntity
-      .map(ResponseEntity::ok)
-      //TODO: verify if it is ok if we return a non-persisted pending result to the app
-      .orElse(ResponseEntity.ok(pendingResult()));
+      .map(
+        tr -> {
+          tr.setDateTestCommunicated(LocalDate.now());
+          testResultRepository.saveAndFlush(tr);
+          return ResponseEntity.ok(tr);
+        }
+      )
+      //TODO: verify if it is ok if we return a non-persisted pending result to the app in case it is not found.
+      .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
   }
 
   /**
