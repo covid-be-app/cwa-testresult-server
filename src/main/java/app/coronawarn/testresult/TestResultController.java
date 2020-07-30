@@ -55,7 +55,7 @@ public class TestResultController {
     description = "Get test result response from request."
   )
   @PostMapping(
-    value = "/api/v1/app/result",
+    value = "/v1/app/result",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
@@ -78,7 +78,7 @@ public class TestResultController {
     description = "Create test results from collection."
   )
   @PostMapping(
-    value = "/api/v1/lab/results",
+    value = "/v1/lab/results",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
