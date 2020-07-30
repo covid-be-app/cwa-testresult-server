@@ -47,9 +47,6 @@ management:
         enabled: true
 testresult:
   cleanup:
-    redeem:
-      days: 21
-      rate: 3600000
     delete:
-      days: 90
-      rate: 3600000
+      days: 10          # 10 days old
+      rate: 3600000     # every hour

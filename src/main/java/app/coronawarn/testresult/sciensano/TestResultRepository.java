@@ -33,7 +33,13 @@ public interface TestResultRepository extends JpaRepository<TestResultEntity, Lo
   Optional<TestResultEntity> findByMobileTestIdAndDatePatientInfectious(
     String mobileTestId, LocalDate datePatientInfectious);
 
+  /**
+   * Ensure that test results beyond the infection date (t0+10) can get deleted.
+   *
+   * @param before all test results older than the date provided that are to be deleted.
+   * @return
+   */
   @Modifying
-  @Query("delete from TestResultEntity t where t.dateTestCommunicated <= ?1")
+  @Query("delete from TestResultEntity t where t.datePatientInfectious <= ?1")
   Integer deleteByResultDateBefore(LocalDate before);
 }
