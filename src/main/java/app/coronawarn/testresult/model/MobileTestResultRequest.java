@@ -32,6 +32,8 @@ import lombok.experimental.Accessors;
 
 /**
  * Request model of the test result.
+ * This is the model used to poll test results.
+ * 
  */
 @Schema(
   description = "The test result request model."

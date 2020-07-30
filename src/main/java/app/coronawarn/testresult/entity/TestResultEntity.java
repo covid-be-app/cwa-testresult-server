@@ -44,9 +44,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * This class represents the test result entity.
- * Data is inserted by recognized test labs via a secure one-way connection.
- * Data is fetched by the verification server, acting as a proxy to this data.
+ * This class represents the main test result entity as it will be provided to us by Sciensano
+ * Data is inserted by recognized test labs via a secure one-way connection. (We cannot access their systems)
+ * The Mobile applicatin polls the resuls via the verification server, that in turn calls this test result service.
+ * The verification service acts as a proxy to this data.
+ *
  */
 @Data
 @Accessors(chain = true)
@@ -97,18 +99,8 @@ public class TestResultEntity {
 
 
   /**
-   * Create a pending result without channel and other data.
+   * Create a pending result with an unknown channel for a particular mobileTestId and datePatientInfectious.
    *
-   * @return
-   */
-  public static TestResultEntity pendingResult() {
-    return new TestResultEntity()
-      .setResult(PENDING)
-      .setResultChannel(UNKNOWN);
-  }
-
-  /**
-   * Create a pending result.
    *
    * @param mobileTestId The mobile test id.
    * @param datePatientInfectious the date patient was diagnosed infectious.

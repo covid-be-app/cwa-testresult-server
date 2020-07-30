@@ -23,15 +23,11 @@ package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
 import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
-import static app.coronawarn.testresult.entity.TestResultEntity.pendingResult;
-import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
-import app.coronawarn.testresult.model.MobileTestResultUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDate;
 import java.util.Optional;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -50,10 +46,11 @@ public class TestResultController {
   private final TestResultRepository testResultRepository;
 
   /**
-   * Get the test result response from a request containing the id.
+   * Get the test result response for a given mobileTestId and datePatientInfectious.
    *
-   * @param request the test result request with id
-   * @return the test result response
+   * @param request the MobileTestResultRequest containing themobileTestId and datePatientInfectious.
+   *
+   * @return the test result response.
    */
   @Operation(description = "Get test result response from request.")
   @PostMapping(value = "/v1/app/mobiletestresult", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -80,38 +77,6 @@ public class TestResultController {
       .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
   }
 
-  /**
-   * Insert or update the test results.
-   *
-   * @param list the test result list request
-   * @return the response
-   */
-  @Operation(description = "Create test results from collection.")
-  @PostMapping(value = "/v1/lab/results", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> results(@RequestBody @NotNull @Valid MobileTestResultList list) {
-    // TODO: find out how this worked in DE (how this was secured)
-    // https://github.com/corona-warn-app/cwa-testresult-server/issues/65
-    // Managed on firewall level
-    log.info("Received {} test results to insert or update from lab.", list.getMobileTestResultUpdateRequest().size());
-    list.getMobileTestResultUpdateRequest().forEach(this::createOrUpdate);
-    return ResponseEntity.noContent().build();
-  }
 
-  private void createOrUpdate(@Valid MobileTestResultUpdateRequest mobileTestResultUpdateRequest) {
-    TestResultEntity testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
-      mobileTestResultUpdateRequest.getMobileTestId(),
-      mobileTestResultUpdateRequest.getDatePatientInfectious()
-    ).orElse(pendingResult(
-      mobileTestResultUpdateRequest.getMobileTestId(),
-      mobileTestResultUpdateRequest.getDatePatientInfectious())
-    );
-
-    testResultEntity.setDateTestPerformed(mobileTestResultUpdateRequest.getDateTestPerformed());
-    testResultEntity.setDateSampleCollected(mobileTestResultUpdateRequest.getDateSampleCollected());
-    testResultEntity.setResultChannel(mobileTestResultUpdateRequest.getResultChannel());
-    testResultEntity.setResult(mobileTestResultUpdateRequest.getResult());
-    testResultRepository.saveAndFlush(testResultEntity);
-
-  }
 
 }

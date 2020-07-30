@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
- * Model of the test result list.
+ * Model of the test result update request  list.
  */
 @Schema(
   description = "The test result list model."

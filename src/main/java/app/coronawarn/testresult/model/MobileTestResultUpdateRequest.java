@@ -34,7 +34,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * Request model of the test result.
+ * Request model of the test result update request.
+ * This model can be used to insert test results (only used for non-prod and testing purposes).
  */
 @Schema(
   description = "The test result request model."

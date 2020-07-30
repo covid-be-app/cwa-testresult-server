@@ -17,7 +17,7 @@ public class TestResultCleanup {
   private final TestResultRepository testResultRepository;
 
   /**
-   * All test results that are older than configured days should get deleted.
+   * All test results that are older than configured days should get deleted from the database.
    */
   @Scheduled(
     fixedDelayString = "${testresult.cleanup.delete.rate}"
