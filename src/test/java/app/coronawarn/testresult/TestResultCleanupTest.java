@@ -22,7 +22,7 @@ import rx.Single;
 @RunWith(SpringRunner.class)
 @SpringBootTest(
   properties = {
-    "testresult.cleanup.delete.days=90",
+    "testresult.cleanup.delete.days=10",
     "testresult.cleanup.delete.rate=1000"
   }
 )
@@ -45,15 +45,14 @@ public class TestResultCleanupTest {
     Result result = PENDING;
     ResultChannel channel = LAB;
     String mobileTestId = "123456789012345";
-    LocalDate datePatientInfectious = LocalDate.now();
+    LocalDate datePatientInfectious = LocalDate.now().minusDays(10);
     // create
     TestResultEntity create = testResultRepository.save(new TestResultEntity()
       .setResult(result)
       .setResultChannel(channel)
       .setDatePatientInfectious(datePatientInfectious)
       .setDateTestPerformed(datePatientInfectious)
-      .setDateSampleCollected(datePatientInfectious.minusDays(4))
-      .setDateTestCommunicated(LocalDate.now().minusDays(90))
+      .setDateSampleCollected(datePatientInfectious.plusDays(2))
       .setMobileTestId(mobileTestId)
     );
 
@@ -69,7 +68,7 @@ public class TestResultCleanupTest {
     Single.fromCallable(() -> true).delay(2, TimeUnit.SECONDS).toBlocking().value();
     // find
     find =testResultRepository.findByMobileTestIdAndDatePatientInfectious(
-      mobileTestId,datePatientInfectious.minusDays(5));
+      mobileTestId,datePatientInfectious);
     Assert.assertFalse(find.isPresent());
   }
 }
