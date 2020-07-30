@@ -21,12 +21,14 @@
 
 package app.coronawarn.testresult;
 
-import app.coronawarn.testresult.model.TestResult;
-import app.coronawarn.testresult.model.TestResultList;
-import app.coronawarn.testresult.model.TestResultRequest;
+import app.coronawarn.testresult.entity.TestResultEntity;
+import app.coronawarn.testresult.model.MobileTestResultList;
+import app.coronawarn.testresult.model.MobileTestResultRequest;
+import app.coronawarn.testresult.model.MobileTestResultUpdateRequest;
+import app.coronawarn.testresult.sciensano.TestResultRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +49,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ContextConfiguration(classes = TestResultApplication.class)
 public class TestResultControllerTest {
 
+  public static final String MOBILE_TEST_ID = "123456789012345";
   @Autowired
   private MockMvc mockMvc;
   @Autowired
@@ -61,13 +64,14 @@ public class TestResultControllerTest {
 
   @Test
   public void insertInvalidIdShouldReturnBadRequest() throws Exception {
-    // data
-    String id = "";
-    Integer result = 0;
-    // create
-    List<TestResult> invalid = Collections.singletonList(
-      new TestResult().setId("").setResult(0)
-    );
+    MobileTestResultList invalid = new MobileTestResultList()
+      .setMobileTestResultUpdateRequest (Collections.singletonList(
+        new MobileTestResultUpdateRequest()
+          .setResult(TestResultEntity.Result.PENDING)
+          .setMobileTestId(null)
+          .setDatePatientInfectious(LocalDate.now())
+        )
+      );
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -79,12 +83,16 @@ public class TestResultControllerTest {
 
   @Test
   public void insertInvalidResultShouldReturnBadRequest() throws Exception {
-    // data
-    String id = "a".repeat(64);
-    // create
-    TestResultList invalid = new TestResultList().setTestResults(Collections.singletonList(
-      new TestResult().setId(id)
-    ));
+
+    MobileTestResultList invalid = new MobileTestResultList()
+      .setMobileTestResultUpdateRequest (Collections.singletonList(
+        new MobileTestResultUpdateRequest()
+          .setResult(TestResultEntity.Result.PENDING)
+          .setMobileTestId("123456789012345")
+          .setDatePatientInfectious(null)
+        )
+      );
+
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -92,28 +100,21 @@ public class TestResultControllerTest {
       .content(objectMapper.writeValueAsString(invalid)))
       .andDo(MockMvcResultHandlers.print())
       .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    // create
-    invalid = new TestResultList().setTestResults(Collections.singletonList(
-      new TestResult().setId(id).setResult(4)
-    ));
-    mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
-      .accept(MediaType.APPLICATION_JSON_VALUE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(objectMapper.writeValueAsString(invalid)))
-      .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
   }
 
   @Test
   public void insertValidShouldReturnNoContent() throws Exception {
-    // data
-    String id = "b".repeat(64);
-    Integer result = 1;
-    // create
-    TestResultList valid = new TestResultList().setTestResults(Collections.singletonList(
-      new TestResult().setId(id).setResult(result)
-    ));
+
+    MobileTestResultList valid = new MobileTestResultList()
+      .setMobileTestResultUpdateRequest (Collections.singletonList(
+        new MobileTestResultUpdateRequest()
+          .setResult(TestResultEntity.Result.POSITIVE)
+          .setMobileTestId("123456789012345")
+          .setDatePatientInfectious(LocalDate.now())
+        )
+      );
+
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -125,13 +126,17 @@ public class TestResultControllerTest {
 
   @Test
   public void insertValidAndGetShouldReturnOk() throws Exception {
-    // data
-    String id = "c".repeat(64);
-    Integer result = 1;
-    // create
-    TestResultList valid = new TestResultList().setTestResults(Collections.singletonList(
-      new TestResult().setId(id).setResult(result)
-    ));
+    LocalDate now = LocalDate.now();
+
+    MobileTestResultList valid = new MobileTestResultList()
+      .setMobileTestResultUpdateRequest (Collections.singletonList(
+        new MobileTestResultUpdateRequest()
+          .setResult(TestResultEntity.Result.POSITIVE)
+          .setMobileTestId(MOBILE_TEST_ID)
+          .setDatePatientInfectious(now)
+        )
+      );
+
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -139,9 +144,12 @@ public class TestResultControllerTest {
       .content(objectMapper.writeValueAsString(valid)))
       .andDo(MockMvcResultHandlers.print())
       .andExpect(MockMvcResultMatchers.status().isNoContent());
+
     // get
-    TestResultRequest request = new TestResultRequest()
-      .setId(id);
+    MobileTestResultRequest request = new MobileTestResultRequest()
+      .setMobileTestId("123456789012345")
+      .setDatePatientInfectious(now);
+
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/app/result")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -153,16 +161,9 @@ public class TestResultControllerTest {
 
   @Test
   public void notExistingTestResultShouldReturnOk() throws Exception {
-    // data
-    String id = "d".repeat(64);
-    Integer result = 1;
-    // create
-    List<TestResult> valid = Collections.singletonList(
-      new TestResult().setId(id).setResult(result)
-    );
-    // get
-    TestResultRequest request = new TestResultRequest()
-      .setId(id);
+    MobileTestResultRequest request = new MobileTestResultRequest()
+      .setMobileTestId("987654321012345")
+      .setDatePatientInfectious(LocalDate.now());
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/app/result")
       .accept(MediaType.APPLICATION_JSON_VALUE)

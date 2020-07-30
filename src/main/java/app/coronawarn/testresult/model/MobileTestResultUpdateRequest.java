@@ -21,40 +21,37 @@
 
 package app.coronawarn.testresult.model;
 
+import app.coronawarn.testresult.entity.TestResultEntity.Result;
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
- * Response model of the test result.
+ * Request model of the test result.
  */
 @Schema(
-  description = "The test result response model."
+  description = "The test result request model."
 )
-@Getter
-@ToString
-@EqualsAndHashCode
-public class TestResultResponse {
+@Data
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class MobileTestResultUpdateRequest {
 
-  /**
-   * The test result value from test lab.
-   * Pending  = 0 : The test result does not exist yet
-   * Negative = 1 : No indication for COVID-19
-   * Positive = 2 : The test result indicates infection with COVID-19
-   * Invalid  = 3 : The test result is invalid due to unknown reason
-   * Redeemed = 4 : The test result is redeemed by time
-   */
   @NotNull
-  @Min(0)
-  @Max(4)
-  private Integer testResult;
+  @Pattern(regexp = "^[0-9]{15}")
+  private String mobileTestId;
 
-  public TestResultResponse setTestResult(Integer testResult) {
-    this.testResult = testResult;
-    return this;
-  }
+  @NotNull
+  private LocalDate datePatientInfectious;
+
+  @NotNull
+  private Result result;
+
+
 }

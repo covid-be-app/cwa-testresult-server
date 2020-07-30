@@ -1,9 +1,7 @@
-package app.coronawarn.testresult;
+package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.config.TestResultConfig;
-import app.coronawarn.testresult.entity.TestResultEntity;
-import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.LocalDate;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,20 +17,6 @@ public class TestResultCleanup {
   private final TestResultRepository testResultRepository;
 
   /**
-   * All test results that are older than configured days should be marked as redeemed.
-   */
-  @Scheduled(
-    fixedDelayString = "${testresult.cleanup.redeem.rate}"
-  )
-  @Transactional
-  public void redeem() {
-    Integer redeemed = testResultRepository.updateResultByResultDateBefore(
-      TestResultEntity.Result.REDEEMED.ordinal(),
-      LocalDateTime.now().minus(Period.ofDays(testResultConfig.getCleanup().getRedeem().getDays())));
-    log.info("Cleanup redeemed {} test results.", redeemed);
-  }
-
-  /**
    * All test results that are older than configured days should get deleted.
    */
   @Scheduled(
@@ -41,7 +25,7 @@ public class TestResultCleanup {
   @Transactional
   public void delete() {
     Integer deleted = testResultRepository.deleteByResultDateBefore(
-      LocalDateTime.now().minus(Period.ofDays(testResultConfig.getCleanup().getDelete().getDays())));
+      LocalDate.now().minusDays(testResultConfig.getCleanup().getDelete().getDays()));
     log.info("Cleanup deleted {} test results.", deleted);
   }
 }

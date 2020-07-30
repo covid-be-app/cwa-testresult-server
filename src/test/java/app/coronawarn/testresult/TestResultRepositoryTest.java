@@ -22,9 +22,17 @@
 package app.coronawarn.testresult;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
-import java.time.LocalDateTime;
+import app.coronawarn.testresult.entity.TestResultEntity.Result;
+import static app.coronawarn.testresult.entity.TestResultEntity.Result.PENDING;
+import app.coronawarn.testresult.entity.TestResultEntity.ResultChannel;
+import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.LAB;
+import app.coronawarn.testresult.sciensano.TestResultRepository;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,27 +56,34 @@ public class TestResultRepositoryTest {
 
   @Test
   public void createAndFindByResultId() {
-    // data
-    Integer result = 1;
-    String resultId = "a".repeat(64);
-    LocalDateTime resultDate = LocalDateTime.now();
+    Result result = PENDING;
+    ResultChannel channel = LAB;
+    String mobileTestId = "123456789012345";
+    LocalDate datePatientInfectious = LocalDate.now();
     // create
     TestResultEntity create = testResultRepository.save(new TestResultEntity()
       .setResult(result)
-      .setResultId(resultId)
-      .setResultDate(resultDate)
+      .setResultChannel(channel)
+      .setDatePatientInfectious(datePatientInfectious)
+      .setDateTestPerformed(datePatientInfectious.minusDays(5))
+      .setDateSampleCollected(datePatientInfectious.minusDays(4))
+      .setDateTestCommunicated(null)
+      .setMobileTestId(mobileTestId)
     );
-    Assert.assertNotNull(create);
-    Assert.assertEquals(resultId, create.getResultId());
+    assertNotNull(create);
+    assertEquals(mobileTestId, create.getMobileTestId());
     // find
-    Optional<TestResultEntity> find = testResultRepository.findByResultId(resultId);
+    Optional<TestResultEntity> find = testResultRepository.findByMobileTestIdAndDatePatientInfectious(mobileTestId,datePatientInfectious);
     Assert.assertTrue(find.isPresent());
-    Assert.assertEquals(result, find.get().getResult());
-    Assert.assertEquals(resultId, find.get().getResultId());
-    Assert.assertEquals(resultDate, find.get().getResultDate());
-    Assert.assertNotNull(find.get().getCreatedAt());
-    Assert.assertNotNull(find.get().getUpdatedAt());
-    Assert.assertNotNull(find.get().getVersion());
+    assertEquals(result, find.get().getResult());
+    assertEquals(mobileTestId, find.get().getMobileTestId());
+    assertEquals(datePatientInfectious, find.get().getDatePatientInfectious());
+    assertEquals(datePatientInfectious.minusDays(5), find.get().getDateTestPerformed());
+    assertEquals(datePatientInfectious.minusDays(4), find.get().getDateSampleCollected());
+    assertNull(find.get().getDateTestCommunicated());
+    assertNotNull(find.get().getCreatedAt());
+    assertNotNull(find.get().getUpdatedAt());
+    assertNotNull(find.get().getVersion());
   }
 
 }
