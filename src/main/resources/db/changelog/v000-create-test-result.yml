@@ -38,7 +38,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: mobile_test_id
-                  type: varchar(64)
+                  type: varchar(15)
                   constraints:
                     nullable: false
               - column:
@@ -83,12 +83,12 @@ databaseChangeLog:
             columns:
               - column:
                   name: mobile_test_id
-                  type: varchar(64)
+                  type: varchar(15)
               - column:
                   name: date_patient_infectious
                   type: date
   - changeSet:
-      id:  addUniqueConstraint-example
+      id:  addUniqueConstraint_mobile_test_id_date_patient_infectious
       author: ddewaele
       changes:
         - addUniqueConstraint:
