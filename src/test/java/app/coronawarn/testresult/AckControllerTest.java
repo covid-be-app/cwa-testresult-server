@@ -69,7 +69,7 @@ public class AckControllerTest {
   }
 
   @Test
-  public void insertMultipleMobileTestIdsWithDifferentDatesShouldReturnNoContent() throws Exception {
+  public void executingAnAckResultsInDateTestCommunicated() throws Exception {
 
     MobileTestResultList valid1 = new MobileTestResultList()
       .setMobileTestResultUpdateRequest (Collections.singletonList(
