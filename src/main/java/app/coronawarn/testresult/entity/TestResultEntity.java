@@ -47,7 +47,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 /**
  * This class represents the main test result entity as it will be provided to us by Sciensano
  * Data is inserted by recognized test labs via a secure one-way connection. (We cannot access their systems)
- * The Mobile applicatin polls the resuls via the verification server, that in turn calls this test result service.
+ * The Mobile application polls the results via the verification server, that in turn calls this test result service.
  * The verification service acts as a proxy to this data.
  *
  */
