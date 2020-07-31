@@ -19,35 +19,21 @@
  * under the License.
  */
 
-package app.coronawarn.testresult.model;
+package app.coronawarn.testresult.sciensano;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import app.coronawarn.testresult.entity.TestResultEntity;
+import java.time.LocalDate;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
-/**
- * Request model of the test result.
- */
-@Schema(
-  description = "The test result request model."
-)
-@Getter
-@ToString
-@EqualsAndHashCode
-public class TestResultRequest {
+public interface TestResultRepository extends JpaRepository<TestResultEntity, Long> {
 
-  /**
-   * Hash (SHA256) of test result id (aka QR-Code, GUID) encoded as hex string.
-   */
-  @NotBlank
-  @Pattern(regexp = "^([A-Fa-f0-9]{2}){32}$")
-  private String id;
+  Optional<TestResultEntity> findByMobileTestIdAndDatePatientInfectious(
+    String mobileTestId, LocalDate datePatientInfectious);
 
-  public TestResultRequest setId(String id) {
-    this.id = id;
-    return this;
-  }
+  @Modifying
+  @Query("delete from TestResultEntity t where t.dateTestCommunicated <= ?1")
+  Integer deleteByResultDateBefore(LocalDate before);
 }
