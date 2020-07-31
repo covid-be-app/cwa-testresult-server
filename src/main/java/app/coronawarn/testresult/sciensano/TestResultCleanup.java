@@ -29,7 +29,7 @@ public class TestResultCleanup {
   @Scheduled(fixedDelayString = "${testresult.cleanup.delete.rate}")
   @Transactional
   public void delete() {
-    Integer deleted = testResultRepository.deleteByResultDateBefore(
+    Integer deleted = testResultRepository.deleteObsoleteTestResult(
       LocalDate.now().minusDays(testResultConfig.getCleanup().getDelete().getDays()));
     log.info("Cleanup deleted {} test results.", deleted);
   }
