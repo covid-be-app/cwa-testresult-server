@@ -178,7 +178,7 @@ public class TestResultControllerTest {
       .setDatePatientInfectious(LocalDate.now());
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/app/mobiletestresult")
+      .post("/v1/app/testresult/poll")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request1)))
@@ -199,7 +199,7 @@ public class TestResultControllerTest {
       .setDatePatientInfectious(LocalDate.now().minusDays(1));
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/app/mobiletestresult")
+      .post("/v1/app/testresult/poll")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request2)))
@@ -247,7 +247,7 @@ public class TestResultControllerTest {
       .setDatePatientInfectious(now);
 
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/app/mobiletestresult")
+      .post("/v1/app/testresult/poll")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
@@ -256,7 +256,7 @@ public class TestResultControllerTest {
       .andExpect(jsonPath("$.mobileTestId").value(request.getMobileTestId()))
       .andExpect(jsonPath("$.datePatientInfectious").value(request.getDatePatientInfectious().toString()))
       .andExpect(jsonPath("$.dateSampleCollected").value(LocalDate.now().toString()))
-      .andExpect(jsonPath("$.dateTestCommunicated").value(LocalDate.now().toString()))
+      .andExpect(jsonPath("$.dateTestCommunicated").doesNotExist())
       .andExpect(jsonPath("$.result").value(POSITIVE.toString()))
       .andExpect(jsonPath("$.resultChannel").value(LAB.toString()))
       .andExpect(jsonPath("$.id").doesNotExist())
@@ -271,7 +271,7 @@ public class TestResultControllerTest {
       .setMobileTestId("987654321012345")
       .setDatePatientInfectious(LocalDate.now());
     mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/app/mobiletestresult")
+      .post("/v1/app/testresult/poll")
       .accept(MediaType.APPLICATION_JSON_VALUE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
