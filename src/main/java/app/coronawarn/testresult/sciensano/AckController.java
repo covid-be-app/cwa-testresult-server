@@ -47,7 +47,8 @@ public class AckController {
   private final TestResultRepository testResultRepository;
 
   /**
-   * Get the test result response for a given mobileTestId and datePatientInfectious.
+   * Provides a way for the mobile app to acknowledge the reception of a result.
+   * only when properly ack-ed by the mobile app will the dateTestCommunicated date be set
    *
    * @param request the MobileTestResultRequest containing themobileTestId and datePatientInfectious.
    *
@@ -62,6 +63,8 @@ public class AckController {
     testResultEntity.ifPresent(tr -> {
       tr.setDateTestCommunicated(LocalDate.now());
     });
+
+    //TODO: here we will need to trigger the AC calculation (CBA-92)
 
     return ResponseEntity.ok().build();
   }
