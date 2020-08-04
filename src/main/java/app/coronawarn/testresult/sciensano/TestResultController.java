@@ -25,6 +25,7 @@ import app.coronawarn.testresult.entity.TestResultEntity;
 import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import java.time.LocalDate;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -58,6 +59,10 @@ public class TestResultController {
   public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
+
+    testResultEntity.ifPresent(tr -> {
+      tr.setDateTestCommunicated(LocalDate.now());
+    });
 
     return testResultEntity
       .map(ResponseEntity::ok)
