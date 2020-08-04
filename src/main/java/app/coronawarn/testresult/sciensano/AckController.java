@@ -22,9 +22,9 @@
 package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
+import static app.coronawarn.testresult.entity.TestResultEntity.Result.REDEEMED;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import java.time.LocalDate;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -61,7 +61,7 @@ public class AckController {
       request.getMobileTestId(), request.getDatePatientInfectious());
 
     testResultEntity.ifPresent(tr -> {
-      tr.setDateTestCommunicated(LocalDate.now());
+      tr.setResult(REDEEMED);
     });
 
     //TODO: here we will need to trigger the AC calculation (CBA-92)

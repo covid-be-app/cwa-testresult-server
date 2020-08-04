@@ -256,7 +256,7 @@ public class TestResultControllerTest {
       .andExpect(jsonPath("$.mobileTestId").value(request.getMobileTestId()))
       .andExpect(jsonPath("$.datePatientInfectious").value(request.getDatePatientInfectious().toString()))
       .andExpect(jsonPath("$.dateSampleCollected").value(LocalDate.now().toString()))
-      .andExpect(jsonPath("$.dateTestCommunicated").doesNotExist())
+      .andExpect(jsonPath("$.dateTestCommunicated").value(LocalDate.now().toString()))
       .andExpect(jsonPath("$.result").value(POSITIVE.toString()))
       .andExpect(jsonPath("$.resultChannel").value(LAB.toString()))
       .andExpect(jsonPath("$.id").doesNotExist())

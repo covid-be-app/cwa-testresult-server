@@ -102,7 +102,7 @@ public class AckControllerTest {
       .andExpect(MockMvcResultMatchers.status().isOk())
       .andExpect(jsonPath("$.mobileTestId").value(request.getMobileTestId()))
       .andExpect(jsonPath("$.datePatientInfectious").value(request.getDatePatientInfectious().toString()))
-      .andExpect(jsonPath("$.dateTestCommunicated").doesNotExist());
+      .andExpect(jsonPath("$.dateTestCommunicated").value(LocalDate.now().toString()));
 
     mockMvc.perform(MockMvcRequestBuilders
       .post("/v1/app/testresult/ack")
