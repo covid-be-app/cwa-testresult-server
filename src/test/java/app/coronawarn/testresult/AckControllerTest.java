@@ -110,7 +110,7 @@ public class AckControllerTest {
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
       .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isOk());
+      .andExpect(MockMvcResultMatchers.status().isNoContent());
 
 
     TestResultEntity testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(MOBILE_TEST_ID, LocalDate.now()).get();
