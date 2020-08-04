@@ -205,6 +205,12 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <environmentVariables>
+            <CLOUD_AWS_STACK_AUTO>false</CLOUD_AWS_STACK_AUTO>
+            <AWS_PARAMSTORE_ENABLED>false</AWS_PARAMSTORE_ENABLED>
+          </environmentVariables>
+        </configuration>
         <executions>
           <execution>
             <id>pre-integration-test</id>
