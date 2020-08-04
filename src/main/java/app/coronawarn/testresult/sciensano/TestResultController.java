@@ -61,7 +61,7 @@ public class TestResultController {
 
     return testResultEntity
       .map(ResponseEntity::ok)
-      // If we don't find a test result (or we did a "dummy" poll)
+      // If we don't find a test result
       // we simply return a dummy test result (plausible deniability)
       .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
   }

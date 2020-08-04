@@ -56,7 +56,7 @@ public class AckController {
    */
   @Operation(description = "Get test result response from request.")
   @PostMapping(value = "/v1/app/testresult/ack", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
+  public ResponseEntity<?> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
 
@@ -65,8 +65,7 @@ public class AckController {
     });
 
     //TODO: here we will need to trigger the AC calculation (CBA-92)
-
-    return ResponseEntity.ok().build();
+    return ResponseEntity.noContent().build();
   }
 
 }
