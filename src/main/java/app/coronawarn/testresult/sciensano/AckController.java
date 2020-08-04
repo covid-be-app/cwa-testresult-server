@@ -22,9 +22,9 @@
 package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
-import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import java.time.LocalDate;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -42,28 +42,31 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @Transactional
 @RestController
-public class TestResultController {
+public class AckController {
 
   private final TestResultRepository testResultRepository;
 
   /**
-   * Get the test result response for a given mobileTestId and datePatientInfectious.
+   * Provides a way for the mobile app to acknowledge the reception of a result.
+   * only when properly ack-ed by the mobile app will the dateTestCommunicated date be set
    *
    * @param request the MobileTestResultRequest containing themobileTestId and datePatientInfectious.
    *
    * @return the test result response.
    */
   @Operation(description = "Get test result response from request.")
-  @PostMapping(value = "/v1/app/testresult/poll", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/v1/app/testresult/ack", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
 
-    return testResultEntity
-      .map(ResponseEntity::ok)
-      // If we don't find a test result (or we did a "dummy" poll)
-      // we simply return a dummy test result (plausible deniability)
-      .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
+    testResultEntity.ifPresent(tr -> {
+      tr.setDateTestCommunicated(LocalDate.now());
+    });
+
+    //TODO: here we will need to trigger the AC calculation (CBA-92)
+
+    return ResponseEntity.ok().build();
   }
 
 }
