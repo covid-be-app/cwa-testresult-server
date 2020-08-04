@@ -50,3 +50,7 @@ testresult:
     delete:
       days: 10          # 10 days old
       rate: 3600000     # every hour
+cloud:
+  aws:
+    region:
+      static: eu-central-1
