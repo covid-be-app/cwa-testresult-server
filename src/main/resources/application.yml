@@ -54,3 +54,5 @@ cloud:
   aws:
     region:
       static: eu-central-1
+    stack:
+      auto: false
