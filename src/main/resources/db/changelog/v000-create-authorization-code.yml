@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-authorization-code-table
+      author: ddewaele
+      changes:
+        - createTable:
+            tableName: authorization_code
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: signature
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mobile_test_id
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_patient_infectious
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_test_communicated
+                  type: date
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create-authorization-code-table-increment
+      author: ddewaele
+      changes:
+        - addAutoIncrement:
+            tableName: authorization_code
+            columnName: id
+            columnDataType: bigint
+            startWith: 1
+            incrementBy: 1
+

@@ -2,3 +2,7 @@ databaseChangeLog:
 - include:
     file: changelog/v000-create-test-result.yml
     relativeToChangelogFile: true
+
+- include:
+    file: changelog/v000-create-authorization-code.yml
+    relativeToChangelogFile: true

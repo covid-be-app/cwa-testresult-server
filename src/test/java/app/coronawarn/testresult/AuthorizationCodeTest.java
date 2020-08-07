@@ -1,4 +1,4 @@
-/*
+  /*
  * Corona-Warn-App / cwa-testresult-server
  *
  * (C) 2020, T-Systems International GmbH
@@ -21,17 +21,15 @@
 
 package app.coronawarn.testresult;
 
+import app.coronawarn.testresult.authorizationcode.AuthorizationCodeRepository;
 import app.coronawarn.testresult.entity.TestResultEntity;
+import static app.coronawarn.testresult.entity.TestResultEntity.Result.NEGATIVE;
 import static app.coronawarn.testresult.entity.TestResultEntity.Result.POSITIVE;
-import static app.coronawarn.testresult.entity.TestResultEntity.Result.REDEEMED;
 import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.LAB;
-import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
-import app.coronawarn.testresult.model.MobileTestResultUpdateRequest;
 import app.coronawarn.testresult.sciensano.TestResultRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
-import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,51 +45,104 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("allow-test-result-insert")
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = TestResultApplication.class)
-public class AckControllerTest {
+public class AuthorizationCodeTest {
 
   public static final String MOBILE_TEST_ID = "123456789012345";
+
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ObjectMapper objectMapper;
+
   @Autowired
   private TestResultRepository testResultRepository;
+
+  @Autowired
+  private AuthorizationCodeRepository authorizationCodeRepository;
 
   @Before
   public void before() {
     testResultRepository.deleteAll();
+    authorizationCodeRepository.deleteAll();
   }
 
   @Test
-  public void executingAnAckResultsInDateTestCommunicated() throws Exception {
+  public void pollingNegativeResultShouldNotResultInACGeneration() throws Exception {
+    LocalDate now = LocalDate.now();
 
-    MobileTestResultList valid1 = new MobileTestResultList()
-      .setMobileTestResultUpdateRequest (Collections.singletonList(
-        new MobileTestResultUpdateRequest()
-          .setResult(POSITIVE)
-          .setResultChannel(LAB)
-          .setMobileTestId(MOBILE_TEST_ID)
-          .setDatePatientInfectious(LocalDate.now())
-        )
-      );
+    TestResultEntity testNegative = new TestResultEntity()
+      .setResult(NEGATIVE)
+      .setResultChannel(LAB)
+      .setMobileTestId(MOBILE_TEST_ID)
+      .setDatePatientInfectious(now)
+      .setDateSampleCollected(now);
 
-    mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/lab/results")
-      .accept(MediaType.APPLICATION_JSON_VALUE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(objectMapper.writeValueAsString(valid1)))
-      .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isNoContent());
+    testResultRepository.save(testNegative);
 
     MobileTestResultRequest request = new MobileTestResultRequest()
       .setMobileTestId(MOBILE_TEST_ID)
+      .setDatePatientInfectious(now);
+
+    mockMvc.perform(MockMvcRequestBuilders
+      .post("/v1/app/testresult/poll")
+      .accept(MediaType.APPLICATION_JSON_VALUE)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(request)))
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(MockMvcResultMatchers.status().isOk());
+
+    Assert.assertTrue(authorizationCodeRepository.findAll().isEmpty());
+  }
+
+  @Test
+  public void pollingPositiveResultShouldResultInACGeneration() throws Exception {
+    LocalDate now = LocalDate.now();
+
+    TestResultEntity testPositive = new TestResultEntity()
+      .setResult(POSITIVE)
+      .setResultChannel(LAB)
+      .setMobileTestId(MOBILE_TEST_ID)
+      .setDatePatientInfectious(now)
+      .setDateSampleCollected(now);
+
+    testResultRepository.save(testPositive);
+
+    MobileTestResultRequest request = new MobileTestResultRequest()
+      .setMobileTestId(MOBILE_TEST_ID)
+      .setDatePatientInfectious(now);
+
+    mockMvc.perform(MockMvcRequestBuilders
+      .post("/v1/app/testresult/poll")
+      .accept(MediaType.APPLICATION_JSON_VALUE)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(request)))
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(MockMvcResultMatchers.status().isOk());
+
+    Assert.assertEquals(1,authorizationCodeRepository.findAll().size());
+
+    mockMvc.perform(MockMvcRequestBuilders
+      .post("/v1/app/testresult/poll")
+      .accept(MediaType.APPLICATION_JSON_VALUE)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(request)))
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(MockMvcResultMatchers.status().isOk());
+
+    Assert.assertEquals(1,authorizationCodeRepository.findAll().size());
+  }
+
+  @Test
+  public void pollingNonExistingTestResultShouldNotGenerateAC() throws Exception {
+    MobileTestResultRequest request = new MobileTestResultRequest()
+      .setMobileTestId("987654321012345")
       .setDatePatientInfectious(LocalDate.now());
 
     mockMvc.perform(MockMvcRequestBuilders
@@ -100,24 +151,9 @@ public class AckControllerTest {
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .content(objectMapper.writeValueAsString(request)))
       .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isOk())
-      .andExpect(jsonPath("$.mobileTestId").value(request.getMobileTestId()))
-      .andExpect(jsonPath("$.result").value(POSITIVE.toString()))
-      .andExpect(jsonPath("$.datePatientInfectious").value(request.getDatePatientInfectious().toString()))
-      .andExpect(jsonPath("$.dateTestCommunicated").value(LocalDate.now().toString()));
+      .andExpect(MockMvcResultMatchers.status().isOk());
 
-    mockMvc.perform(MockMvcRequestBuilders
-      .post("/v1/app/testresult/ack")
-      .accept(MediaType.APPLICATION_JSON_VALUE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(objectMapper.writeValueAsString(request)))
-      .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isNoContent());
-
-
-    TestResultEntity testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(MOBILE_TEST_ID, LocalDate.now()).get();
-    Assert.assertEquals(LocalDate.now(), testResultEntity.getDateTestCommunicated());
-    Assert.assertEquals(REDEEMED, testResultEntity.getResult());
+    Assert.assertTrue(authorizationCodeRepository.findAll().isEmpty());
 
   }
 
