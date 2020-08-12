@@ -21,12 +21,14 @@
 
 package app.coronawarn.testresult.sciensano;
 
+import app.coronawarn.testresult.authorizationcode.AuthorizationCodeService;
 import app.coronawarn.testresult.entity.TestResultEntity;
 import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDate;
 import java.util.Optional;
+import static java.util.function.Predicate.not;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +49,18 @@ public class TestResultController {
 
   private final TestResultRepository testResultRepository;
 
+  private final AuthorizationCodeService authorizationCodeService;
+
   /**
+   * <p>
    * Get the test result response for a given mobileTestId and datePatientInfectious.
+   * When fetching for a test result there can be multiple outcomes ....
+   * </p>
+   * a) a valid test result has been found and is returned. At that point we set the communication date and calculate
+   *    the AC
+   * b) a valid test result has been found but was already communicated. In that case we simply return the result
+   *    but do nothing
+   * c) no test result is found for the given token, In that case we return a dummy request.
    *
    * @param request the MobileTestResultRequest containing themobileTestId and datePatientInfectious.
    *
@@ -60,14 +72,17 @@ public class TestResultController {
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
 
-    testResultEntity.ifPresent(tr -> {
+    testResultEntity.filter(
+      not(TestResultEntity::hasTestBeenCommunicated)
+    ).ifPresent(tr -> {
       tr.setDateTestCommunicated(LocalDate.now());
+      if (tr.isPositive()) {
+        authorizationCodeService.generateAndSaveAuthorizationCode(tr);
+      }
     });
 
     return testResultEntity
       .map(ResponseEntity::ok)
-      // If we don't find a test result
-      // we simply return a dummy test result (plausible deniability)
       .orElse(ResponseEntity.ok(dummyPendingResult(request.getMobileTestId())));
   }
 

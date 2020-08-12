@@ -58,10 +58,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TestResultControllerTest {
 
   public static final String MOBILE_TEST_ID = "123456789012345";
+
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ObjectMapper objectMapper;
+
   @Autowired
   private TestResultRepository testResultRepository;
 
@@ -266,7 +269,7 @@ public class TestResultControllerTest {
   }
 
   @Test
-  public void notExistingTestResultShouldReturnOk() throws Exception {
+  public void notExistingTestResultShouldReturnOkWithDummyResult() throws Exception {
     MobileTestResultRequest request = new MobileTestResultRequest()
       .setMobileTestId("987654321012345")
       .setDatePatientInfectious(LocalDate.now());
