@@ -1,11 +1,3 @@
-cloud:
-  aws:
-    stack:
-      auto: false
-aws:
-  paramstore:
-    enabled: false
-
 testresult:
   signature:
     private-key-content:  |

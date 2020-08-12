@@ -1,9 +1,12 @@
 package app.coronawarn.testresult.authorizationcode;
 
+import static app.coronawarn.testresult.HexUtils.toHexString;
 import app.coronawarn.testresult.PemUtils;
+import app.coronawarn.testresult.config.TestResultConfig;
 import app.coronawarn.testresult.entity.AuthorizationCodeEntity;
 import app.coronawarn.testresult.entity.TestResultEntity;
 import java.security.PrivateKey;
+import java.security.Signature;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +27,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthorizationCodeService {
 
-  private static final String PRIVATE_KEY_RESOURCE = "private.pem";
-
-  private final SignatureGenerator signatureGenerator;
   private final AuthorizationCodeRepository authorizationCodeRepository;
+
+  private final TestResultConfig testResultConfig;
+
+  /**
+   * Key algortihm used during key generation / key reads.
+   * https://docs.oracle.com/javase/10/docs/specs/security/standard-names.html#keypairgenerator-algorithms
+   */
+  private static final String SIGNATURE_ALGORITHM = "SHA256withECDSA";     // WORKS WITH Key Algorithm EC
+
 
   /**
    * Generates the authorization code for the test result.
@@ -40,8 +49,8 @@ public class AuthorizationCodeService {
 
       AuthorizationCodeEntity authorizationCodeEntity = new AuthorizationCodeEntity();
 
-      PrivateKey privateKey = PemUtils.readPrivateKeyFromFile(PRIVATE_KEY_RESOURCE, "RSA");
-      String signature = signatureGenerator.sign(privateKey, testResultEntity.getSignatureData());
+      PrivateKey privateKey = PemUtils.getPrivateKeyFromString(testResultConfig.getSignature().getPrivateKeyContent());
+      String signature = sign(privateKey, testResultEntity.getSignatureData());
 
       authorizationCodeEntity.setMobileTestId(testResultEntity.getMobileTestId());
       authorizationCodeEntity.setDatePatientInfectious(testResultEntity.getDatePatientInfectious());
@@ -55,5 +64,25 @@ public class AuthorizationCodeService {
     }
 
   }
+
+  /**
+   * Sign the data using the provided private key.
+   *
+   * @param privateKey the public key used to sign the data
+   * @param data       the data to be signed
+   * @return the signature in hex string format.
+   * @throws Exception in case something goes wrong.
+   */
+  private String sign(PrivateKey privateKey, String data) throws Exception {
+    Signature dsa = Signature.getInstance(SIGNATURE_ALGORITHM);
+    dsa.initSign(privateKey);
+
+    byte[] strByte = data.getBytes("UTF-8");
+    dsa.update(strByte);
+    byte[] realSig = dsa.sign();
+    return toHexString(realSig);
+  }
+
+
 
 }
