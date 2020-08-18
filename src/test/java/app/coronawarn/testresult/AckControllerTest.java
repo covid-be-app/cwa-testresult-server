@@ -21,9 +21,7 @@
 
 package app.coronawarn.testresult;
 
-import app.coronawarn.testresult.entity.TestResultEntity;
 import static app.coronawarn.testresult.entity.TestResultEntity.Result.POSITIVE;
-import static app.coronawarn.testresult.entity.TestResultEntity.Result.REDEEMED;
 import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.LAB;
 import app.coronawarn.testresult.model.MobileTestResultList;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
@@ -70,7 +68,7 @@ public class AckControllerTest {
   }
 
   @Test
-  public void executingAnAckResultsInDateTestCommunicated() throws Exception {
+  public void executingAnAckResultsInTestDeletedImmediately() throws Exception {
 
     MobileTestResultList valid1 = new MobileTestResultList()
       .setMobileTestResultUpdateRequest (Collections.singletonList(
@@ -114,10 +112,7 @@ public class AckControllerTest {
       .andDo(MockMvcResultHandlers.print())
       .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-
-    TestResultEntity testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(MOBILE_TEST_ID, LocalDate.now()).get();
-    Assert.assertEquals(LocalDate.now(), testResultEntity.getDateTestCommunicated());
-    Assert.assertEquals(REDEEMED, testResultEntity.getResult());
+    Assert.assertTrue(testResultRepository.findByMobileTestIdAndDatePatientInfectious(MOBILE_TEST_ID, LocalDate.now()).isEmpty());
 
   }
 
