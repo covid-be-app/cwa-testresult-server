@@ -68,7 +68,7 @@ public class TestResultController {
    */
   @Operation(description = "Get test result response from request.")
   @PostMapping(value = "/v1/app/testresult/poll", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<TestResultEntity> mobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
+  public ResponseEntity<TestResultEntity> pollMobileTestResult(@RequestBody @Valid MobileTestResultRequest request) {
     Optional<TestResultEntity> testResultEntity = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
       request.getMobileTestId(), request.getDatePatientInfectious());
 

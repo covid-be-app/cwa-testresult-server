@@ -23,7 +23,8 @@ import rx.Single;
 @SpringBootTest(
   properties = {
     "testresult.cleanup.delete.days=10",
-    "testresult.cleanup.delete.rate=1000"
+    "testresult.cleanup.delete.rate=1000",
+    "testresult.authorizationcode.tranfer.rate=1000"
   }
 )
 @ContextConfiguration(classes = TestResultApplication.class)
