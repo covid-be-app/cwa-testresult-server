@@ -1,6 +1,5 @@
 package app.coronawarn.testresult.authorizationcode;
 
-import app.coronawarn.testresult.client.SubmissionServerClient;
 import app.coronawarn.testresult.entity.AuthorizationCodeEntity;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -20,21 +19,23 @@ import org.springframework.stereotype.Component;
 public class AuthorizationCodeCopier {
 
   private final AuthorizationCodeRepository authorizationCodeRepository;
-  private final SubmissionServerClient submissionServerClient;
+  private final SubmissionServerGateway submissionServerGateway;
+
 
   /**
    * Fetch all ACs and transfer them to the submission server.
    */
-  @Scheduled(fixedDelayString = "${testresult.authorizationcode.transfer.rate}")
+  @Scheduled(initialDelay = 2000, fixedDelayString = "${testresult.authorizationcode.transfer.rate}")
   @Transactional
   public void copyACs() {
     List<AuthorizationCodeEntity> all = authorizationCodeRepository.findAll();
-    log.info("Fetched {} ACs.", all.size());
-    ResponseEntity<Void> voidResponseEntity = submissionServerClient.processAuthorizationCodes(
-      AuthorizationCodeRequest.withAuthorizationCodes(all));
-    log.info("Found return code {}",voidResponseEntity.getStatusCode());
 
-    log.info("Deleting {} ACs.", all.size());
+    ResponseEntity<Void> voidResponseEntity = submissionServerGateway.processAuthorizationCodes(
+      AuthorizationCodeRequest.withAuthorizationCodes(all));
+
+    if (voidResponseEntity.getStatusCode().isError()) {
+      log.error("Error while processing authorization codes by submission server");
+    }
     authorizationCodeRepository.deleteAll(all);
   }
 
