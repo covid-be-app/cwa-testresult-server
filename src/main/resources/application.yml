@@ -50,9 +50,16 @@ testresult:
     delete:
       days: 10          # 10 days old
       rate: 3600000     # every hour
+  authorizationcode:
+    transfer:
+      rate: 60000       # every minute
 cloud:
   aws:
     region:
       static: eu-central-1
     stack:
       auto: false
+
+
+cwa-submission-server:
+  url: http://localhost:8085/submission-api
