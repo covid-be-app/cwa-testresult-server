@@ -209,6 +209,7 @@
           <environmentVariables>
             <CLOUD_AWS_STACK_AUTO>false</CLOUD_AWS_STACK_AUTO>
             <AWS_PARAMSTORE_ENABLED>false</AWS_PARAMSTORE_ENABLED>
+            <SERVER_SSL_ENABLED>false</SERVER_SSL_ENABLED>
           </environmentVariables>
         </configuration>
         <executions>
