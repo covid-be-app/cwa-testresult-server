@@ -33,7 +33,6 @@ jobs:
   deploy-prd-testresult:
     name: "Deploy the external testresult service to the prd environment"
     runs-on: ubuntu-latest
-    if: github.base_ref == 'master' && github.event.action == 'closed' && github.event.pull_request.merged
     needs:
       - tag-testresult-image
     steps:
@@ -77,7 +76,6 @@ jobs:
   deploy-prd-testresult-int:
     name: "Deploy the internal testresult service to the prd environment"
     runs-on: ubuntu-latest
-    if: github.base_ref == 'master' && github.event.action == 'closed' && github.event.pull_request.merged
     needs:
       - tag-testresult-image
     steps:
