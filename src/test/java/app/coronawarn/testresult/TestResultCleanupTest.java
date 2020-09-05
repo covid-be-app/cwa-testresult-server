@@ -1,8 +1,12 @@
 package app.coronawarn.testresult;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
-import java.time.LocalDateTime;
-import java.time.Period;
+import app.coronawarn.testresult.entity.TestResultEntity.Result;
+import static app.coronawarn.testresult.entity.TestResultEntity.Result.PENDING;
+import app.coronawarn.testresult.entity.TestResultEntity.ResultChannel;
+import static app.coronawarn.testresult.entity.TestResultEntity.ResultChannel.LAB;
+import app.coronawarn.testresult.sciensano.TestResultRepository;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
@@ -18,10 +22,9 @@ import rx.Single;
 @RunWith(SpringRunner.class)
 @SpringBootTest(
   properties = {
-    "testresult.cleanup.redeem.days=21",
-    "testresult.cleanup.redeem.rate=1000",
-    "testresult.cleanup.delete.days=90",
-    "testresult.cleanup.delete.rate=1000"
+    "testresult.cleanup.delete.days=10",
+    "testresult.cleanup.delete.rate=1000",
+    "testresult.authorizationcode.tranfer.rate=1000"
   }
 )
 @ContextConfiguration(classes = TestResultApplication.class)
@@ -36,59 +39,37 @@ public class TestResultCleanupTest {
   }
 
   @Test
-  public void shouldCleanupRedeem() {
-    // prepare
-    testResultRepository.deleteAll();
-    // data
-    String resultId = "a".repeat(64);
-    Integer resultRedeemed = TestResultEntity.Result.REDEEMED.ordinal();
-    LocalDateTime resultDate = LocalDateTime.now().minus(Period.ofDays(21));
-    // create
-    TestResultEntity create = testResultRepository.save(new TestResultEntity()
-      .setResult(1)
-      .setResultId(resultId)
-      .setResultDate(resultDate)
-    );
-    Assert.assertNotNull(create);
-    Assert.assertEquals(resultId, create.getResultId());
-    // find
-    Optional<TestResultEntity> find = testResultRepository.findByResultId(resultId);
-    Assert.assertTrue(find.isPresent());
-    Assert.assertEquals(resultId, find.get().getResultId());
-    Assert.assertEquals(resultDate, find.get().getResultDate());
-    // wait
-    Single.fromCallable(() -> true).delay(2, TimeUnit.SECONDS).toBlocking().value();
-    // find
-    find = testResultRepository.findByResultId(resultId);
-    Assert.assertTrue(find.isPresent());
-    Assert.assertEquals(resultId, find.get().getResultId());
-    Assert.assertEquals(resultRedeemed, find.get().getResult());
-  }
-
-  @Test
   public void shouldCleanupDelete() {
     // prepare
     testResultRepository.deleteAll();
-    // data
-    String resultId = "d".repeat(64);
-    LocalDateTime resultDate = LocalDateTime.now().minus(Period.ofDays(90));
+
+    Result result = PENDING;
+    ResultChannel channel = LAB;
+    String mobileTestId = "123456789012345";
+    LocalDate datePatientInfectious = LocalDate.now().minusDays(10);
     // create
     TestResultEntity create = testResultRepository.save(new TestResultEntity()
-      .setResult(1)
-      .setResultId(resultId)
-      .setResultDate(resultDate)
+      .setResult(result)
+      .setResultChannel(channel)
+      .setDatePatientInfectious(datePatientInfectious)
+      .setDateTestPerformed(datePatientInfectious)
+      .setDateSampleCollected(datePatientInfectious.plusDays(2))
+      .setMobileTestId(mobileTestId)
     );
+
     Assert.assertNotNull(create);
-    Assert.assertEquals(resultId, create.getResultId());
+    Assert.assertEquals(mobileTestId, create.getMobileTestId());
     // find
-    Optional<TestResultEntity> find = testResultRepository.findByResultId(resultId);
+    Optional<TestResultEntity> find = testResultRepository.findByMobileTestIdAndDatePatientInfectious(
+      mobileTestId,datePatientInfectious);
     Assert.assertTrue(find.isPresent());
-    Assert.assertEquals(resultId, find.get().getResultId());
-    Assert.assertEquals(resultDate, find.get().getResultDate());
+    Assert.assertEquals(mobileTestId, find.get().getMobileTestId());
+    Assert.assertEquals(datePatientInfectious, find.get().getDatePatientInfectious());
     // wait
     Single.fromCallable(() -> true).delay(2, TimeUnit.SECONDS).toBlocking().value();
     // find
-    find = testResultRepository.findByResultId(resultId);
+    find =testResultRepository.findByMobileTestIdAndDatePatientInfectious(
+      mobileTestId,datePatientInfectious);
     Assert.assertFalse(find.isPresent());
   }
 }

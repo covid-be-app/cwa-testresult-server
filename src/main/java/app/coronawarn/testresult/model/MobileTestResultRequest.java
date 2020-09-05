@@ -22,32 +22,34 @@
 package app.coronawarn.testresult.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * Request model of the test result.
+ * This is the model used to poll test results.
+ * 
  */
 @Schema(
   description = "The test result request model."
 )
-@Getter
-@ToString
-@EqualsAndHashCode
-public class TestResultRequest {
+@Data
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class MobileTestResultRequest {
 
-  /**
-   * Hash (SHA256) of test result id (aka QR-Code, GUID) encoded as hex string.
-   */
-  @NotBlank
-  @Pattern(regexp = "^([A-Fa-f0-9]{2}){32}$")
-  private String id;
+  @NotNull
+  @Pattern(regexp = "^[0-9]{15}")
+  private String mobileTestId;
 
-  public TestResultRequest setId(String id) {
-    this.id = id;
-    return this;
-  }
+  @NotNull
+  private LocalDate datePatientInfectious;
+
+
 }

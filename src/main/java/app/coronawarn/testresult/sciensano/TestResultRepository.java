@@ -19,10 +19,10 @@
  * under the License.
  */
 
-package app.coronawarn.testresult;
+package app.coronawarn.testresult.sciensano;
 
 import app.coronawarn.testresult.entity.TestResultEntity;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,13 +30,16 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TestResultRepository extends JpaRepository<TestResultEntity, Long> {
 
-  Optional<TestResultEntity> findByResultId(String resultId);
+  Optional<TestResultEntity> findByMobileTestIdAndDatePatientInfectious(
+    String mobileTestId, LocalDate datePatientInfectious);
 
+  /**
+   * Ensure that test results beyond the patient infectious date + 10 can get deleted.
+   *
+   * @param before all test results older than the date provided that are to be deleted.
+   * @return
+   */
   @Modifying
-  @Query("update TestResultEntity t set t.result = ?1 where t.result != ?1 and t.resultDate < ?2")
-  Integer updateResultByResultDateBefore(Integer result, LocalDateTime before);
-
-  @Modifying
-  @Query("delete from TestResultEntity t where t.resultDate < ?1")
-  Integer deleteByResultDateBefore(LocalDateTime before);
+  @Query("delete from TestResultEntity t where t.datePatientInfectious <= ?1")
+  Integer deleteObsoleteTestResult(LocalDate before);
 }

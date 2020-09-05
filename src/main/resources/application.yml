@@ -12,14 +12,36 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.yml
+server:
+  ssl:
+    enabled: true
+    enabled-protocols: TLSv1.2,TLSv1.3
+    protocol: TLS
+    ciphers: >-
+      TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
+      TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
+      TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+      TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+      TLS_AES_128_GCM_SHA256
+      TLS_AES_256_GCM_SHA384
+      TLS_AES_128_CCM_SHA256
+    key-password: ${SSL_TESTRESULT_KEYSTORE_PASSWORD}
+    key-store: ${SSL_TESTRESULT_KEYSTORE_PATH}
+    key-store-password: ${SSL_TESTRESULT_KEYSTORE_PASSWORD}
+    key-store-provider: SUN
+    key-store-type: JKS
+  servlet:
+    context-path: /test-results-api
 springdoc:
   api-docs:
-    path: /api/docs
+    path: /api-docs/docs
   swagger-ui:
-    path: /api/swagger
+    path: /api-docs/swagger
 management:
-  server:
-    port: 8081
   endpoint:
     info:
       enabled: true
@@ -46,9 +68,19 @@ management:
         enabled: true
 testresult:
   cleanup:
-    redeem:
-      days: 21
-      rate: 3600000
     delete:
-      days: 90
-      rate: 3600000
+      days: 10          # 10 days old
+      rate: 3600000     # every hour
+  authorizationcode:
+    transfer:
+      rate: 60000       # every minute
+cloud:
+  aws:
+    region:
+      static: eu-central-1
+    stack:
+      auto: false
+
+
+cwa-submission-server:
+  url: http://localhost:8085/submission-api

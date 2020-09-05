@@ -2,9 +2,7 @@ databaseChangeLog:
 - include:
     file: changelog/v000-create-test-result.yml
     relativeToChangelogFile: true
+
 - include:
-    file: changelog/v001-update-test-result-result-nullable.yml
-    relativeToChangelogFile: true
-- include:
-    file: changelog/v002-revert-test-result-result-nullable.yml
+    file: changelog/v000-create-authorization-code.yml
     relativeToChangelogFile: true

@@ -1,0 +1,16 @@
+cloud:
+  aws:
+    stack:
+      auto: false
+aws:
+  paramstore:
+    enabled: false
+
+testresult:
+  signature:
+    private-key-content:  |
+      -----BEGIN PRIVATE KEY-----
+      MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgPHXRoyF/38arobxv
+      4HSPUTT3LdtlM81unc1QwgHIa4ChRANCAAQyu+5ExT35s2WudDuwywX3urOb8YEV
+      luNZOiW1inh69DK0Y41wVlsyDdepinkN6JhFEC64RSqCJg5DXWD/TmnW
+      -----END PRIVATE KEY-----

@@ -1,65 +1,97 @@
 databaseChangeLog:
-- changeSet:
-    id: create-test-result-table
-    author: jhagestedt
-    changes:
-    - createTable:
-        tableName: test_result
-        columns:
-        - column:
-            name: id
-            type: bigint
-            constraints:
-              unique: true
-              nullable: false
-              primaryKey: true
-        - column:
-            name: version
-            type: bigint
-        - column:
-            name: created_at
-            type: datetime
-            constraints:
-              nullable: false
-        - column:
-            name: updated_at
-            type: datetime
-            constraints:
-              nullable: false
-        - column:
-            name: result
-            type: integer
-            constraints:
-              nullable: false
-        - column:
-            name: result_id
-            type: varchar(64)
-            constraints:
-              unique: true
-              nullable: false
-        - column:
-            name: result_date
-            type: datetime
-            constraints:
-              nullable: false
-- changeSet:
-    id: create-test-result-table-increment
-    author: jhagestedt
-    changes:
-    - addAutoIncrement:
-        tableName: test_result
-        columnName: id
-        columnDataType: bigint
-        startWith: 1
-        incrementBy: 1
-- changeSet:
-    id: create-test-result-table-indexes
-    author: jhagestedt
-    changes:
-    - createIndex:
-        tableName: test_result
-        indexName: idx_test_result_result_id
-        columns:
-        - column:
-            name: result_id
-            type: varchar(64)
+  - changeSet:
+      id: create-test-result-table
+      author: ddewaele
+      changes:
+        - createTable:
+            tableName: sciensano_test_result
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: version
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result_channel
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mobile_test_id
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_patient_infectious
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_sample_collected
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_test_performed
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_test_communicated
+                  type: date
+                  constraints:
+                    nullable: true
+
+
+  - changeSet:
+      id: create-sciensano-test-result-table-increment
+      author: ddewaele
+      changes:
+        - addAutoIncrement:
+            tableName: sciensano_test_result
+            columnName: id
+            columnDataType: bigint
+            startWith: 1
+            incrementBy: 1
+  - changeSet:
+      id: create-test-result-table-indexes
+      author: ddewaele
+      changes:
+        - createIndex:
+            tableName: sciensano_test_result
+            indexName: idx_test_result_mobile_test_id_date_patient_infectious
+            columns:
+              - column:
+                  name: mobile_test_id
+                  type: varchar(15)
+              - column:
+                  name: date_patient_infectious
+                  type: date
+  - changeSet:
+      id:  addUniqueConstraint_mobile_test_id_date_patient_infectious
+      author: ddewaele
+      changes:
+        - addUniqueConstraint:
+            columnNames:  mobile_test_id, date_patient_infectious
+            constraintName:  check_mobile_test_id_date_patient_infectious_unique
+            tableName:  sciensano_test_result
