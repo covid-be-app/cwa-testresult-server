@@ -142,6 +142,7 @@ public class TestResultEntity {
       .setResultChannel(UNKNOWN)
       .setMobileTestId(mobileTestId)
       .setDateTestCommunicated(LocalDate.now())
+      .setDateTestPerformed(LocalDate.now())
       .setDatePatientInfectious(LocalDate.now())
       .setDateSampleCollected(LocalDate.now());
   }
