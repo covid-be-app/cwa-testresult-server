@@ -26,6 +26,7 @@ import app.coronawarn.testresult.authorizationcode.AuthorizationCodeService;
 import app.coronawarn.testresult.entity.TestResultEntity;
 import static app.coronawarn.testresult.entity.TestResultEntity.dummyPendingResult;
 import app.coronawarn.testresult.model.MobileTestResultRequest;
+import app.coronawarn.testresult.monitoring.TestRequestMonitor;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -51,6 +52,8 @@ public class TestResultController {
   private final TestResultRepository testResultRepository;
 
   private final AuthorizationCodeService authorizationCodeService;
+
+  private final TestRequestMonitor testRequestMonitor;
 
   /**
    * <p>
@@ -78,7 +81,10 @@ public class TestResultController {
     ).ifPresent(tr -> {
       tr.setDateTestCommunicated(LocalDate.now());
       if (tr.isPositive()) {
+        testRequestMonitor.incrementPositiveTestResponse();
         authorizationCodeService.generateAndSaveAuthorizationCode(tr);
+      } else {
+        testRequestMonitor.incrementNegativeTestResponse();
       }
     });
 
