@@ -74,6 +74,9 @@ testresult:
   authorizationcode:
     transfer:
       rate: 60000       # every minute
+  monitoring:
+    batch-size: 1
+
 cloud:
   aws:
     region:

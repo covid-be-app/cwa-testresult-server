@@ -36,6 +36,7 @@ public class TestResultConfig {
 
   private Cleanup cleanup;
   private Signature signature;
+  private Monitoring monitoring;
 
   @Getter
   @Setter
@@ -50,6 +51,14 @@ public class TestResultConfig {
   public static class Scheduled {
 
     private Integer days;
+
+  }
+
+  @Getter
+  @Setter
+  public static class Monitoring {
+
+    private Integer batchSize;
 
   }
 
