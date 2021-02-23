@@ -36,6 +36,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -52,6 +53,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Accessors(chain = true)
 @NoArgsConstructor
 @RequiredArgsConstructor
+@ToString
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "authorization_code")

@@ -49,15 +49,21 @@ public class AuthorizationCodeCopier {
   @Scheduled(initialDelay = 2000, fixedDelayString = "${testresult.authorizationcode.transfer.rate}")
   @Transactional
   public void copyACs() {
+    log.debug("AC Transfer - Copying ACs");
     List<AuthorizationCodeEntity> all = authorizationCodeRepository.findAll();
+
+    log.debug("AC Transfer - Found to copy ACs {}",all);
 
     ResponseEntity<Void> voidResponseEntity = submissionServerGateway.processAuthorizationCodes(
       AuthorizationCodeRequest.withAuthorizationCodes(all));
 
     if (voidResponseEntity.getStatusCode().isError()) {
-      log.error("Error while processing authorization codes by submission server");
+      log.debug("AC Transfer - Error while processing authorization codes by submission server");
     }
+
     authorizationCodeRepository.deleteAll(all);
+
+    log.debug("AC Transfer - Done copying {} ACs",all.size());
   }
 
 }
