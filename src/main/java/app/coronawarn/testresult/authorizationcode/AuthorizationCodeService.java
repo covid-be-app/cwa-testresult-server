@@ -29,6 +29,7 @@ import app.coronawarn.testresult.entity.TestResultEntity;
 import java.security.PrivateKey;
 import java.security.Signature;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
  * It is important to only generate 1 such signature for a test result to avoid having duplicates in the database.
  * </p>
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthorizationCodeService {
@@ -68,6 +70,8 @@ public class AuthorizationCodeService {
 
     try {
 
+      log.debug("AC Generation - Start AC generation for {}",testResultEntity.getMobileTestId());
+
       AuthorizationCodeEntity authorizationCodeEntity = new AuthorizationCodeEntity();
 
       PrivateKey privateKey = PemUtils.getPrivateKeyFromString(testResultConfig.getSignature().getPrivateKeyContent());
@@ -80,8 +84,11 @@ public class AuthorizationCodeService {
 
       authorizationCodeRepository.save(authorizationCodeEntity);
 
+      log.debug("AC Generation - Generated and saved AC {}",authorizationCodeEntity);
+
     } catch (Exception ex) {
-      throw new IllegalArgumentException("Unable to generate and save authorization code",ex);
+      log.error("AC Generation - Unable to generate and save authorization code",ex);
+      throw new IllegalArgumentException("AC Generation - Unable to generate and save authorization code",ex);
     }
 
   }
