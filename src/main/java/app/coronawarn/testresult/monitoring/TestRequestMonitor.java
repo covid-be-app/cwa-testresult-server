@@ -36,8 +36,6 @@ public class TestRequestMonitor {
   private final MeterRegistry meterRegistry;
   private final long batchSize;
 
-  private BatchCounter nonExistingTestRequests;
-  private BatchCounter dummyTestRequests;
   private BatchCounter positiveResponses;
   private BatchCounter negativeResponses;
 
@@ -63,18 +61,8 @@ public class TestRequestMonitor {
    *  </ul>
    */
   private void initializeCounters() {
-    nonExistingTestRequests = new BatchCounter(meterRegistry, batchSize, "nonexisting");
-    dummyTestRequests = new BatchCounter(meterRegistry, batchSize, "dummy");
     positiveResponses = new BatchCounter(meterRegistry, batchSize, "positive");
     negativeResponses = new BatchCounter(meterRegistry, batchSize, "negative");
-  }
-
-  public void incrementNonExistingTestRequest() {
-    nonExistingTestRequests.increment();
-  }
-
-  public void incrementDummyTestRequest() {
-    dummyTestRequests.increment();
   }
 
   public void incrementPositiveTestResponse() {
